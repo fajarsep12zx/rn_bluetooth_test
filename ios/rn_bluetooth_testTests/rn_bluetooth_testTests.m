@@ -7,11 +7,11 @@
 #define TIMEOUT_SECONDS 600
 #define TEXT_TO_LOOK_FOR @"Welcome to React"
 
-@interface rn_starterTests : XCTestCase
+@interface rn_bluetooth_testTests : XCTestCase
 
 @end
 
-@implementation rn_starterTests
+@implementation rn_bluetooth_testTests
 
 - (BOOL)findSubviewInView:(UIView *)view matching:(BOOL(^)(UIView *view))test
 {
