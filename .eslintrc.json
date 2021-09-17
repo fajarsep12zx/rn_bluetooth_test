@@ -1,0 +1,80 @@
+{
+  "parser": "@typescript-eslint/parser",
+  "extends": [
+    "@react-native-community",
+    "airbnb-typescript",
+    "prettier",
+    "prettier/react"
+  ],
+  "env": {
+    "browser": true,
+    "node": true,
+    "es6": true,
+    "jest": true
+  },
+  "plugins": ["@typescript-eslint", "unused-imports", "import"],
+  "rules": {
+    "semi": "off",
+    "@typescript-eslint/semi": [2, "never"],
+    "react/jsx-filename-extension": [
+      1,
+      {"extensions": [".js", ".jsx", ".ts", ".tsx"]}
+    ],
+    "no-use-before-define": ["error", {"functions": false}],
+    "import/no-extraneous-dependencies": 0,
+    "import/no-unresolved": 0,
+    "import/prefer-default-export": 0,
+    "import/extensions": 0,
+    "linebreak-style": 0,
+    "react/require-default-props": [0],
+    "no-param-reassign": [
+      "error",
+      {"props": true, "ignorePropertyModificationsFor": ["state"]}
+    ],
+    "react/prop-types": 0,
+    "@typescript-eslint/explicit-function-return-type": 0,
+    "@typescript-eslint/explicit-member-accessibility": 0,
+    "@typescript-eslint/indent": 0,
+    "@typescript-eslint/member-delimiter-style": 0,
+    "@typescript-eslint/no-explicit-any": 0,
+    "@typescript-eslint/no-var-requires": 0,
+    "@typescript-eslint/no-use-before-define": 0,
+    "@typescript-eslint/no-unused-vars": "off",
+    "unused-imports/no-unused-imports": "error",
+    "unused-imports/no-unused-vars": "error",
+    "import/no-cycle": 0,
+    "import/order": [
+      "error",
+      {
+        "alphabetize": {
+          "order": "asc",
+          "caseInsensitive": true
+        },
+        "newlines-between": "always",
+        "groups": [
+          "builtin",
+          "external",
+          "internal",
+          "parent",
+          "sibling",
+          "index"
+        ],
+        "pathGroups": [
+          {
+            "pattern": "{react,react-native}",
+            "group": "builtin",
+            "position": "before"
+          },
+          {
+            "pattern": "~/**",
+            "group": "internal"
+          }
+        ],
+        "pathGroupsExcludedImportTypes": ["builtin"]
+      }
+    ]
+  },
+  "parserOptions": {
+    "project": "./tsconfig.json"
+  }
+}
