@@ -1,7 +1,6 @@
 {
   "parser": "@typescript-eslint/parser",
   "extends": [
-    "@react-native-community",
     "airbnb-typescript",
     "prettier",
     "prettier/react"
