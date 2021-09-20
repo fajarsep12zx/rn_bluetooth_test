@@ -12,14 +12,12 @@ import BleManager, { Peripheral } from 'react-native-ble-manager'
 const BleManagerModule = NativeModules.BleManager
 const bleManagerEmitter = new NativeEventEmitter(BleManagerModule)
 
-interface PeripheralConstruct extends Peripheral {
-  connected?: boolean
-}
-
 const useCustom = () => {
   const [isScanning, setIsScanning] = useState(false)
-  const [list, setList] = useState<PeripheralConstruct[]>([])
+  const [list, setList] = useState<Peripheral[]>([])
   const [peripherals, setPeripherals] = useState(new Map())
+  const [connectedDevice, setConnectedDevice] = useState<any>()
+  const [connecting, setConnecting] = useState(false)
 
   const platformPermissionRequest = useCallback(() => {
     PermissionsAndroid.request(
@@ -87,39 +85,18 @@ const useCustom = () => {
     [peripherals]
   )
 
-  const handleDisconnectedPeripheral = (data: {
-    peripheral: PeripheralConstruct
-  }) => {
+  const handleDisconnectedPeripheral = (data: { peripheral: Peripheral }) => {
     const peripheral = peripherals.get(data.peripheral)
     if (peripheral) {
-      peripheral.connected = false
       setPeripherals(peripherals.set(peripheral.id, peripheral))
       setList(Array.from(peripherals.values()))
     }
     console.log(`Disconnected from ${data.peripheral}`)
   }
 
-  const handleRetrieveConnected = useCallback(() => {
-    BleManager.getConnectedPeripherals([]).then((results) => {
-      if (results.length === 0) {
-        console.log('No connected peripherals')
-      }
-      console.log(results)
-      // eslint-disable-next-line no-plusplus
-      for (let i = 0; i < results.length; i++) {
-        const peripheral = results[i] as any
-
-        peripheral.connected = true
-
-        setPeripherals(peripherals.set(peripheral.id, peripheral))
-        setList(Array.from(peripherals.values()))
-      }
-    })
-  }, [peripherals])
-
   const handleUpdateValueForCharacteristic = useCallback(
     (data: {
-      peripheral: PeripheralConstruct
+      peripheral: Peripheral
       characteristic: string
       value: string
     }) => {
@@ -131,51 +108,56 @@ const useCustom = () => {
     []
   )
 
+  const handleDisconnect = useCallback((peripheralId) => {
+    BleManager.disconnect(peripheralId).then(() => {
+      setConnectedDevice({})
+    })
+  }, [])
+
   const handleTestPeripheral = useCallback(
-    (peripheral: PeripheralConstruct) => () => {
+    (peripheral: Peripheral) => () => {
       console.log('connect')
       if (peripheral) {
-        if (peripheral.connected) {
-          BleManager.disconnect(peripheral.id)
-        } else {
-          BleManager.connect(peripheral.id)
-            .then(() => {
-              const connectedPeripheral = peripherals.get(peripheral.id)
-              if (connectedPeripheral) {
-                connectedPeripheral.connected = true
-                setPeripherals(
-                  peripherals.set(peripheral.id, connectedPeripheral)
-                )
-                setList(Array.from(peripherals.values()))
-              }
-              console.log(`Connected to ${peripheral.id}`)
+        setConnecting(true)
+        BleManager.connect(peripheral.id)
+          .then(() => {
+            const connectedPeripheral = peripherals.get(peripheral.id)
+            if (connectedPeripheral) {
+              setPeripherals(
+                peripherals.set(peripheral.id, connectedPeripheral)
+              )
+              setList(Array.from(peripherals.values()))
+            }
+            console.log(`Connected to ${peripheral.id}`)
 
-              setTimeout(() => {
-                /* Test read current RSSI value */
-                BleManager.retrieveServices(peripheral.id).then(
-                  (peripheralData) => {
-                    console.log('Retrieved peripheral services', peripheralData)
+            setTimeout(() => {
+              /* Test read current RSSI value */
+              BleManager.retrieveServices(peripheral.id).then(
+                (peripheralData) => {
+                  console.log('Retrieved peripheral services', peripheralData)
 
-                    BleManager.readRSSI(peripheral.id).then((rssi) => {
-                      console.log('Retrieved actual RSSI value', rssi)
+                  setConnectedDevice(peripheralData)
 
-                      const peripheralRSSI = peripherals.get(peripheral.id)
-                      if (peripheralRSSI) {
-                        peripheralRSSI.rssi = rssi
-                        setPeripherals(
-                          peripherals.set(peripheralRSSI.id, peripheralRSSI)
-                        )
-                        setList(Array.from(peripherals.values()))
-                      }
-                    })
-                  }
-                )
-              }, 900)
-            })
-            .catch((error) => {
-              console.log('Connection error', error)
-            })
-        }
+                  BleManager.readRSSI(peripheral.id).then((rssi) => {
+                    console.log('Retrieved actual RSSI value', rssi)
+
+                    const peripheralRSSI = peripherals.get(peripheral.id)
+                    if (peripheralRSSI) {
+                      peripheralRSSI.rssi = rssi
+                      setPeripherals(
+                        peripherals.set(peripheralRSSI.id, peripheralRSSI)
+                      )
+                      setList(Array.from(peripherals.values()))
+                      setConnecting(false)
+                    }
+                  })
+                }
+              )
+            }, 900)
+          })
+          .catch((error) => {
+            console.log('Connection error', error)
+          })
       }
     },
     [peripherals]
@@ -217,14 +199,16 @@ const useCustom = () => {
 
   return {
     data: {
+      connecting,
+      connectedDevice,
       isScanning,
       list,
     },
     methods: {
+      handleDisconnect,
       handleStartScan,
       handleStopScan,
       handleTestPeripheral,
-      handleRetrieveConnected,
     },
   }
 }

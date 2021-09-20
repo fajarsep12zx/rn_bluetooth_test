@@ -24,6 +24,7 @@
     }
   },
   "dependencies": {
+    "lodash": "^4.17.21",
     "native-base": "^3.1.0",
     "react": "17.0.2",
     "react-native": "0.65.1",
@@ -38,6 +39,7 @@
     "@babel/runtime": "^7.12.5",
     "@react-native-community/eslint-config": "^2.0.0",
     "@types/jest": "^26.0.23",
+    "@types/lodash": "^4.14.173",
     "@types/node": "^16.9.2",
     "@types/react-native": "^0.65.0",
     "@types/react-test-renderer": "^17.0.1",
