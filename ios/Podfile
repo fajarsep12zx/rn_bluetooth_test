@@ -12,6 +12,8 @@ target 'rn_bluetooth_test' do
     :hermes_enabled => false
   )
 
+  pod 'react-native-ble-manager', :path => '../node_modules/react-native-ble-manager'
+
   target 'rn_bluetooth_testTests' do
     inherit! :complete
     # Pods for testing

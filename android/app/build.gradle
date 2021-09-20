@@ -141,6 +141,12 @@ android {
         }
     }
     signingConfigs {
+        release {
+            storeFile file('rn_bluetooth_test.keystore')
+            storePassword 'rn_bluetooth_test'
+            keyAlias 'rn_bluetooth_test'
+            keyPassword 'rn_bluetooth_test'
+        }
         debug {
             storeFile file('debug.keystore')
             storePassword 'android'
